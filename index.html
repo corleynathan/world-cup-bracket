@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2026 World Cup Bracket & Live Standings</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background: #f4f6f9;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+        h1, h2 {
+            text-align: center;
+            color: #1a365d;
+        }
+        p.subtitle {
+            text-align: center;
+            color: #4a5568;
+            margin-bottom: 30px;
+            font-size: 0.95rem;
+        }
+        .layout-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+        }
+        .bracket-container {
+            display: flex;
+            gap: 20px;
+            overflow-x: auto;
+            padding: 20px;
+            align-items: center;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        .round {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            min-width: 260px;
+            height: 1200px;
+        }
+        .matchup {
+            background: #fff;
+            border: 1px solid #cbd5e0;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        .team {
+            padding: 10px 14px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: background 0.2s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #edf2f7;
+            user-select: none;
+        }
+        .team:last-child { border-bottom: none; }
+        .clickable-name { cursor: pointer; flex-grow: 1; display: flex; align-items: center; justify-content: space-between; }
+        .clickable-name:hover { color: #2b6cb0; }
+        .team.empty { color: #a0aec0; background: #f7fafc; font-style: italic; }
+        .owner { font-size: 0.75rem; color: #718096; background: #edf2f7; padding: 2px 6px; border-radius: 4px; margin-left: 8px; }
+        .green-highlight { background: #f0fff4 !important; color: #38a169 !important; }
+        .lock-btn { background: none; border: none; cursor: pointer; font-size: 0.9rem; opacity: 0.5; margin-right: 5px; }
+        .lock-btn:hover { opacity: 1; }
+        .team.locked-state { pointer-events: none; background: #edf2f7; }
+        .team.locked-state .lock-btn { pointer-events: auto; opacity: 1; }
+        .round-title { text-align: center; font-weight: bold; color: #2d3748; background: #e2e8f0; padding: 6px; border-radius: 4px; font-size: 0.9rem; }
+        
+        /* Table Styles */
+        .table-container { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem; }
+        th, td { padding: 10px 12px; border-bottom: 1px solid #e2e8f0; }
+        th { background: #1a365d; color: white; }
+        tr:hover { background: #f7fafc; }
+        
+        /* Admin Console */
+        .admin-box { background: #edf2f7; padding: 20px; border-radius: 8px; border: 1px solid #cbd5e0; }
+        .admin-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 15px; align-items: center; }
+        .admin-grid label { font-size: 0.85rem; font-weight: bold; color: #4a5568; }
+        .admin-grid input, .admin-grid select { padding: 6px; border-radius: 4px; border: 1px solid #cbd5e0; width: 100%; box-sizing: border-box; }
+        .btn-submit { background: #3182ce; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%; }
+        .btn-submit:hover { background: #2b6cb0; }
+    </style>
+</head>
+<body>
+
+    <h1>2026 World Cup Center</h1>
+    <p class="subtitle">Click team names to advance them. Manage match stats below to update the live standings instantly.</p>
+
+    <div class="layout-grid">
+        <!-- BRACKET COLUMN -->
+        <div class="bracket-container">
+            <!-- ROUND OF 32 -->
+            <div>
+                <div class="round-title">Round of 32</div>
+                <div class="round">
+                    <div class="matchup">
+                        <div class="team empty" id="m73-1"><span class="clickable-name">South Africa</span></div>
+                        <div class="team green-highlight locked-state" id="m73-2"><button class="lock-btn" onclick="toggleLock('m73-2')">🔒</button><span class="clickable-name">Canada</span></div>
+                    </div>
+                    <div class="matchup">
+                        <div class="team" id="m74-1"><button class="lock-btn" onclick="toggleLock('m74-1')">🔓</button><span class="clickable-name" onclick="advance('m74-1', 'r16-1-2')">Netherlands <span class="owner">Julie McNamee</span></span></div>
+                        <div class="team" id="m74-2"><button class="lock-btn" onclick="toggleLock('m74-2')">🔓</button><span class="clickable-name" onclick="advance('m74-2', 'r16-1-2')">Morocco</span></div>
+                    </div>
+                    <div class="matchup">
+                        <div class="team" id="m75-1"><button class="lock-btn" onclick="toggleLock('m75-1')">🔓</button><span class="clickable-name" onclick="advance('m75-1', 'r16-2-1')">Germany <span class="owner">Stephanie Morris</span></span></div>
+                        <div class="team" id="m75-2"><button class="lock-btn" onclick="toggleLock('m75-2')">🔓</button><span class="clickable-name" onclick="advance('m75-2', 'r16-2-1')">Paraguay</span></div>
+                    </div>
+                    <div class="matchup">
+                        <div class="team" id="m76-1"><button class="lock-btn" onclick="toggleLock('m76-1')">🔓</button><span class="clickable-name" onclick="advance('m76-1', 'r16-2-2')">France <span class="owner">Nathan Corley</span></span></div>
+                        <div class="team" id="m76-2"><button class="lock-btn" onclick="toggleLock('m76-2')">🔓</button><span class="clickable-name" onclick="advance('m76-2', 'r16-2-2')">Sweden</span></div>
+                    </div>
+                    <div class="matchup">
+                        <div class="team" id="m77-1"><button class="lock-btn" onclick="toggleLock('m77-1')">🔓</button><span class="clickable-name" onclick="advance('m77-1', 'r16-3-1')">Brazil <span class="owner">Kyle Detwiler</span></span></div>
+                        <div class="team" id="m77-2"><button class="lock-btn" onclick="toggleLock('m77-2')">🔓</button><span class="clickable-name" onclick="advance('m77-2', 'r16-3-1')">Japan</span></div>
+                    </div>
+                    <div class="matchup">
+                        <div class="team" id="m78-1"><button class="lock-btn" onclick="toggleLock('m78-1')">🔓</button><span class="clickable-name" onclick="advance('m78-1', 'r16-3-2')">Côte d'Ivoire</span></div>
+                        <div class="team" id="m78-2"><button class="lock-btn" onclick="toggleLock('m78-2')">🔓</button><span class="clickable-name" onclick="advance('m78-2', 'r16-3-2')">Norway <span class="owner">Corie Detwiler</span></span></div>
+                    </div>
+                    <div class="matchup">
+                        <div class="team" id="m79-1"><button class="lock-btn" onclick="toggleLock('m79-1')">🔓</button><span class="clickable-name" onclick="advance('m79-1', 'r16-4-1')">Mexico <span class="owner">Alex Detwiler</span></span></div>
+                        <div class="team" id="m79-2"><button class="lock-btn" onclick="toggleLock('m79-2')">🔓</button><span class="clickable-name" onclick="advance('m79-2', 'r16-4-1')">Ecuador</span></div>
+                    </div>
+                    <div class="matchup">
+                        <div class="team" id="m80-1"><button class="lock-btn" onclick="toggleLock('m80-1')">🔓</button><span class="clickable-name" onclick="advance('m80-1', 'r16-4-2')">England <span class="owner">Jeff Haus</span></span></div>
+                        <div class="team" id="m80-2"><button class="lock-btn" onclick="toggleLock('m80-2')">🔓</button><span class="clickable-name" onclick="advance('m80-2', 'r16-4-2')">Congo DR</span></div>
+                    </div>
+                    <div class="matchup">
+                        <div class="team" id="m81-1"><button class="lock-btn" onclick="toggleLock('m81-1')">🔓</button><span class="clickable-name" onclick="advance('m81-1', 'r16-5-1')">Portugal <span class="owner">Julie Grossman</span></span></div>
+                        <div class="team" id="m81-2"><button class="lock-btn" onclick="toggleLock('m81-2')">🔓</button><span class="clickable-name" onclick="advance('m81-2', 'r16-5-1')">Croatia</span></div>
+                    </div>
+                    <div class="matchup">
+                        <div class="team" id="m82-1"><button class="lock-btn" onclick="toggleLock('m82-1')">🔓</button><span class="clickable-name" onclick="advance('m82-1', 'r16-5-2')">Spain <span class="owner">Casey Morris</span></span></div>
+                        <div class="team" id="m82-2"><button class="lock-btn" onclick="toggleLock('m82-2')">🔓</button><span class="clickable-name" onclick="advance('m82-2', 'r16-5-2')">Austria</span></div>
+                    </div>
+                    <div class="matchup">
+                        <div class="team" id="m83-1"><button class="lock-btn" onclick="toggleLock('m83-1')">🔓</button><span class="clickable-name" onclick="advance('m83-1', 'r16-6-1')">USA <span class="owner">J.D. Hanisch</span></span></div>
+                        <div class="team" id="m83-2"><button class="lock-btn" onclick="toggleLock('m83-2')">🔓</button><span class="clickable-name" onclick="advance('m83-2', 'r16-6-1')">Bosnia & Herz.</span></div>
+                    </div>
+                    <div class="matchup">
+                        <div class="team" id="m84-1"><button class="lock-btn" onclick="toggleLock('m84-1')">🔓</button><span class="clickable-name" onclick="advance('m84-1', 'r16-6-2')">Belgium <span class="owner">Blake Downer</span></span></div>
+                        <div class="team" id="m84-2"><button class="lock-btn" onclick="toggleLock('m84-2')">🔓</button><span class="clickable-name" onclick="advance('m84-2', 'r16-6-2')">Senegal</span></div>
+                    </div>
+                    <div class="matchup">
+                        <div class="team" id="m85-1"><button class="lock-btn" onclick="toggleLock('m85-1')">🔓</button><span class="clickable-name" onclick="advance('m85-1', 'r16-7-1')">Argentina <span class="owner">Kelsey Downer</span></span></div>
+                        <div class="team" id="m85-2"><button class="lock-btn" onclick="toggleLock('m85-2')">🔓</button><span class="clickable-name" onclick="advance('m85-2', 'r16-7-1')">Cabo Verde</span></div>
+                    </div>
+                    <div class="matchup">
+                        <div class="team" id="m86-1"><button class="lock-btn" onclick="toggleLock('m86-1')">🔓</button><span class="clickable-name" onclick="advance('m86-1', 'r16-7-2')">Australia</span></div>
+                        <div class="team" id="m86-2"><button class="lock-btn" onclick="toggleLock('m86-2')">🔓</button><span class="clickable-name" onclick="advance('m86-2', 'r16-7-2')">Egypt</span></div>
+                    </div>
+                    <div class="matchup">
+                        <div class="team" id="m87-1"><button class="lock-btn" onclick="toggleLock('m87-1')">🔓</button><span class="clickable-name" onclick="advance('m87-1', 'r16-8-1')">Switzerland</span></div>
+                        <div class="team" id="m87-2"><button class="lock-btn" onclick="toggleLock('m87-2')">🔓</button><span class="clickable-name" onclick="advance('m87-2', 'r16-8-1')">Algeria</span></div>
+                    </div>
+                    <div class="matchup">
+                        <div class="team" id="m88-1"><button class="lock-btn" onclick="toggleLock('m88-1')">🔓</button><span class="clickable-name" onclick="advance('m88-1', 'r16-8-2')">Colombia <span class="owner">Chris Walters</span></span></div>
+                        <div class="team" id="m88-2"><button class="lock-btn" onclick="toggleLock('m88-2')">🔓</button><span class="clickable-name" onclick="advance('m88-2', 'r16-8-2')">Ghana</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ROUND OF 16 -->
+            <div>
+                <div class="round-title">Round of 16</div>
+                <div class="round">
+                    <div class="matchup">
+                        <div class="team green-highlight locked-state" id="r16-1-1"><button class="lock-btn" onclick="toggleLock('r16-1-1')">🔒</button><span class="clickable-name" onclick="advance('r16-1-1', 'qf-1-1')">Canada</span></div>
+                        <div class="team empty" id="r16-1-2"><button class="lock-btn" onclick="toggleLock('r16-1-2')">🔓</button><span class="clickable-name" onclick="advance('r16-1-2', 'qf-1-1')">TBD</span></div>
+                    </div>
+                    <div class="matchup">
+                        <div class="team empty" id="r16-2-1"><button class="lock-btn" onclick="toggleLock('r16-2-1')">🔓</button><span class="clickable-name" onclick="advance('r16-2-1', 'qf-1-2')">TBD</span></div>
+                        <div class="team empty" id="r16-2-2"><button class="lock-btn" onclick="toggleLock('r16-2-2')">🔓</button><span class="clickable-name" onclick="advance('r16-2-2', 'qf-1-2')">TBD</span></div>
+                    </div>
+                    <div class="matchup">
+                        <div class="team empty" id="r16-3-1"><button class="lock-btn" onclick="toggleLock('r16-3-1')">🔓</button><span class="clickable-name" onclick="advance('r16-3-1', 'qf-2-1')">TBD</span></div>
+                        <div class="team empty" id="r16-3-2"><button class="lock-btn" onclick="toggleLock('r16-3-2')">🔓</button><span class="clickable-name" onclick="advance('r16-3-2', 'qf-2-1')">TBD</span></div>
+                    </div>
+                    <div class="matchup">
+                        <div class="team empty" id="r16-4-1"><button class="lock-btn" onclick="toggleLock('r16-4-1')">🔓</button><span class="clickable-name" onclick="advance('r16-4-1', 'qf-2-2')">TBD</span></div>
+                        <div class="team empty" id="r16-4-2"><button class="lock-btn" onclick="toggleLock('r16-4-2')">🔓</button><span class="clickable-name" onclick="advance('r16-4-2', 'qf-2-2')">TBD</span></div>
+                    </div>
+                    <div class="matchup">
+                        <div class="team empty" id="r16-5-1"><button class="lock-btn" onclick="toggleLock('r16-5-1')">🔓</button><span class="clickable-name" onclick="advance('r16-5-1', 'qf-3-1')">TBD</span></div>
+                        <div class="team empty" id="r16-5-2"><button class="lock-btn" onclick="toggleLock('r16-5-2')">🔓</button><span class="clickable-name" onclick="advance('r16-5-2', 'qf-3-1')">TBD</span></div>
+                    </div>
+                    <div class="matchup">
+                        <div class="team empty" id="r16-6-1"><button class="lock-btn" onclick="toggleLock('r16-6-1')">🔓</button><span class="clickable-name" onclick="advance('r16-6-1', 'qf-3-2')">TBD</span></div>
+                        <div class="team empty" id="r16-6-2"><button class="lock-btn" onclick="toggleLock('r16-6-2')">🔓</button><span class="clickable-name" onclick="advance('r16-6-2', 'qf-3-2')">TBD</span></div>
+                    </div>
+                    <div class="matchup">
+                        <div class="team empty" id="r16-7-1"><button class="lock-btn" onclick="toggleLock('r16-7-1')">🔓</button><span class="clickable-name" onclick="advance('r16-7-1', 'qf-4-1')">TBD</span></div>
+                        <div class="team empty" id="r16-7-2"><button class="lock-btn" onclick="toggleLock('r16-7-2')">🔓</button><span class="clickable-name" onclick="advance('r16-7-2', 'qf-4-1')">TBD</span></div>
+                    </div>
+                    <div class="matchup">
+                        <div class="team empty" id="r16-8-1"><button class="lock-btn" onclick="toggleLock('r16-8-1')">🔓</button><span class="clickable-name" onclick="advance('r16-8-1', 'qf-4-2')">TBD</span></div>
+                        <div class="team empty" id="r16-8-2"><button class="lock-btn" onclick="toggleLock('r16-8-2')">🔓</button><span class="clickable-name" onclick="advance('r16-8-2', 'qf-4-2')">TBD</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- QUARTERFINALS -->
+            <div>
+                <div class="round-title">Quarterfinals</div>
+                <div class="round">
+                    <div class="matchup">
+                        <div class="team empty" id="qf-1-1"><button class="lock-btn" onclick="toggleLock('qf-1-1')">🔓</button><span class="clickable-name" onclick="advance('qf-1-1', 'sf-1-1')">TBD</span></div>
+                        <div class="team empty" id="qf-1-2"><button class="lock-btn" onclick="toggleLock('qf-1-2')">🔓</button><span class="clickable-name" onclick="advance('qf-1-2', 'sf-1-1')">TBD</span></div>
+                    </div>
+                    <div class="matchup">
+                        <div class="team empty" id="qf-2-1"><button class="lock-btn" onclick="toggleLock('qf-2-1')">🔓</button><span class="clickable-name" onclick="advance('qf-2-1', 'sf-1-2')">TBD</span></div>
+                        <div class="team empty" id="qf-2-2"><button class="lock-btn" onclick="toggleLock('qf-2-2')">🔓</button><span class="clickable-name" onclick="advance('qf-2-2', 'sf-1-2')">TBD</span></div>
+                    </div>
+                    <div class="matchup">
+                        <div class="team empty" id="qf-3-1"><button class="lock-btn" onclick="toggleLock('qf-3-1')">🔓</button><span class="clickable-name" onclick="advance('qf-3-1', 'sf-2-1')">TBD</span></div>
+                        <div class="team empty" id="qf-3-2"><button class="lock-btn" onclick="toggleLock('qf-3-2')">🔓</button><span class="clickable-name" onclick="advance('qf-3-2', 'sf-2-1')">TBD</span></div>
+                    </div>
+                    <div class="matchup">
+                        <div class="team empty" id="qf-4-1"><button class="lock-btn" onclick="toggleLock('qf-4-1')">🔓</button><span class="clickable-name" onclick="advance('qf-4-1', 'sf-2-2')">TBD</span></div>
+                        <div class="team empty" id="qf-4-2"><button class="lock-btn" onclick="toggleLock('qf-4-2')">🔓</button><span class="clickable-name" onclick="advance('qf-4-2', 'sf-2-2')">TBD</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SEMIFINALS -->
+            <div>
+                <div class="round-title">Semifinals</div>
+                <div class="round">
+                    <div class="matchup">
+                        <div class="team empty" id="sf-1-1"><button class="lock-btn" onclick="toggleLock('sf-1-1')">🔓</button><span class="clickable-name" onclick="advance('sf-1-1', 'f-1-1')">TBD</span></div>
+                        <div class="team empty" id="sf-1-2"><button class="lock-btn" onclick="toggleLock('sf-1-2')">🔓</button><span class="clickable-name" onclick="advance('sf-1-2', 'f-1-1')">TBD</span></div>
+                    </div>
+                    <div class="matchup">
+                        <div class="team empty" id="sf-2-1"><button class="lock-btn" onclick="toggleLock('sf-2-1')">🔓</button><span class="clickable-name" onclick="advance('sf-2-1', 'f-1-2')">TBD</span></div>
+                        <div class="team empty" id="sf-2-2"><button class="lock-btn" onclick="toggleLock('sf-2-2')">🔓</button><span class="clickable-name" onclick="advance('sf-2-2', 'f-1-2')">TBD</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FINAL -->
+            <div>
+                <div class="round-title">Final</div>
+                <div class="round">
+                    <div class="matchup" style="height: 120px; justify-content: center;">
+                        <div class="team empty" id="f-1-1"><button class="lock-btn" onclick="toggleLock('f-1-1')">🔓</button><span class="clickable-name" onclick="advance('f-1-1', 'champion')">TBD</span></div>
+                        <div class="team empty" id="f-1-2"><button class="lock-btn" onclick="toggleLock('f-1-2')">🔓</button><span class="clickable-name" onclick="advance('f-1-2', 'champion')">TBD</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CHAMPION -->
+            <div>
+                <div class="round-title">Champion</div>
+                <div class="round">
+                    <div class="matchup" style="border: 2px solid #d69e2e; background: #fffaf0;">
+                        <div class="team empty" id="champion" style="font-weight: bold; font-size: 1.1rem; text-align: center; justify-content: center; padding: 20px;">🏆 TBD</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- LIVE LEADERBOARD COMPONENT -->
+        <div class="table-container">
+            <h2>Live Pool Standings</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Owner</th>
+                        <th>Team</th>
+                        <th>Total Pts</th>
+                        <th>Goal Diff</th>
+                        <th>Goals Scored</th>
+                        <th>Card Points</th>
+                    </tr>
+                </thead>
+                <tbody id="leaderboard-body">
+                    <!-- Dynamic rendering via JS -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- ADMIN INPUT DESK -->
+        <div class="admin-box">
+            <h2>Admin Management Panel</h2>
+            <div class="admin-grid">
+                <div>
+                    <label>Select Country</label>
+                    <select id="country-select">
+                        <option value="France">France (Nathan Corley)</option>
+                        <option value="Argentina">Argentina (Kelsey Downer)</option>
+                        <option value="Mexico">Mexico (Alex Detwiler)</option>
+                        <option value="Netherlands">Netherlands (Julie McNamee)</option>
+                        <option value="Brazil">Brazil (Kyle Detwiler)</option>
+                        <option value="Spain">Spain (Casey Morris)</option>
+                        <option value="England">England (Jeff Haus)</option>
+                        <option value="Colombia">Colombia (Chris Walters)</option>
+                        <option value="Germany">Germany (Stephanie Morris)</option>
+                        <option value="USA">USA (J.D. Hanisch)</option>
+                        <option value="Norway">Norway (Corie Detwiler)</option>
+                        <option value="Portugal">Portugal (Julie Grossman)</option>
+                        <option value="Belgium">Belgium (Blake Downer)</option>
+                        <option value="Turkiye">Turkiye (Grant Detwiler)</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Match Outcome</label>
+                    <select id="match-outcome">
+                        <option value="W">Win (+3 pts)</option>
+                        <option value="T">Tie (+1 pt)</option>
+                        <option value="L">Loss (0 pts)</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Goals Scored (GF)</label>
+                    <input type="number" id="input-gf" value="0" min="0">
+                </div>
+                <div>
+                    <label>Goals Allowed (GA)</label>
+                    <input type="number" id="input-ga" value="0" min="0">
+                </div>
+                <div>
+                    <label>New Yellow Cards</label>
+                    <input type="number" id="input-yellow" value="0" min="0">
+                </div>
+                <div>
+                    <label>New Red Cards</label>
+                    <input type="number" id="input-red" value="0" min="0">
+                </div>
+            </div>
+            <button class="btn-submit" onclick="processAdminUpdate()">Apply Stats to Standings</button>
+        </div>
+    </div>
+
+    <!-- MAIN CONTROL SCRIPT -->
+    <script>
+        // PASTE YOUR LIVE GENERATED RAILWAY GENERATED LINK INSIDE THE QUOTES BELOW!
+        const API_URL = "https://world-cup-backend-production-021a.up.railway.app"; 
+
+        let dataset = {};
+
+        function calculateCardPoints(team) {
+            return (team.red * 2) + (team.yellow * 1);
+        }
+
+        // Retrieve database entries securely on every page load
+        async function fetchLiveStandings() {
+            try {
+                const response = await fetch(`${API_URL}/api/standings`);
+                dataset = await response.json();
+                buildLeaderboard();
+            } catch (err) {
+                console.error("Error connecting to database server:", err);
+            }
+        }
+
+        function buildLeaderboard() {
+            const tbody = document.getElementById('leaderboard-body');
+            if (!tbody) return;
+            tbody.innerHTML = "";
+
+            const sorted = Object.keys(dataset).map(name => ({name, ...dataset[name]})).sort((a, b) => {
+                if (a.eliminated !== b.eliminated) return a.eliminated ? 1 : -1; 
+                if (b.pts !== a.pts) return b.pts - a.pts;
+                if (b.gd !== a.gd) return b.gd - a.gd;
+                if (b.gs !== a.gs) return b.gs - a.gs;
+                let cardsA = calculateCardPoints(a);
+                let cardsB = calculateCardPoints(b);
+                if (cardsB !== cardsA) return cardsB - cardsA; 
+                return a.name.localeCompare(b.name); 
+            });
+
+            sorted.forEach((team, index) => {
+                const tr = document.createElement('tr');
+                if(team.eliminated) tr.style.background = "#fff5f5";
+                tr.innerHTML = `
+                    <td><strong>${index + 1}</strong></td>
+                    <td>${team.owner}</td>
+                    <td>${team.name} ${team.eliminated ? '❌' : ''}</td>
+                    <td><strong>${team.pts}</strong></td>
+                    <td>${team.gd > 0 ? '+' + team.gd : team.gd}</td>
+                    <td>${team.gs}</td>
+                    <td>${calculateCardPoints(team)}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Connect admin interface securely to database endpoints
+        async function processAdminUpdate() {
+            const pass = prompt("Enter Admin Secret Password to authorize changes:");
+            if (!pass) return;
+
+            const payload = {
+                password: pass,
+                country: document.getElementById('country-select').value,
+                outcome: document.getElementById('match-outcome').value,
+                gf: parseInt(document.getElementById('input-gf').value) || 0,
+                ga: parseInt(document.getElementById('input-ga').value) || 0,
+                yellow: parseInt(document.getElementById('input-yellow').value) || 0,
+                red: parseInt(document.getElementById('input-red').value) || 0
+            };
+
+            try {
+                const response = await fetch(`${API_URL}/api/update`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+                if (result.error) {
+                    alert(result.error);
+                } else {
+                    alert("Stats applied and saved securely to database!");
+                    dataset = result.data;
+                    buildLeaderboard();
+                    
+                    // Clear out entries 
+                    document.getElementById('input-gf').value = 0;
+                    document.getElementById('input-ga').value = 0;
+                    document.getElementById('input-yellow').value = 0;
+                    document.getElementById('input-red').value = 0;
+                }
+            } catch (err) {
+                alert("Error sending updates to your database server.");
+            }
+        }
+
+        // Bracket logic remaining static for immediate browser rendering
+        function advance(sourceId, targetId) {
+            let sourceContainer = document.getElementById(sourceId);
+            let targetContainer = document.getElementById(targetId);
+            if (targetContainer.classList.contains('locked-state')) return;
+
+            let sourceNameSpan = sourceContainer.querySelector('.clickable-name');
+            if (sourceContainer.classList.contains('empty') && sourceNameSpan.innerText === 'TBD') return;
+            
+            if (!sourceContainer.classList.contains('empty') && event.currentTarget.innerText === sourceNameSpan.innerText && sourceId !== targetId) {
+                if (!sourceId.startsWith('m')) {
+                    clearSlot(sourceId);
+                    return;
+                }
+            }
+
+            let targetNameSpan = targetContainer.querySelector('.clickable-name');
+            targetNameSpan.innerHTML = sourceNameSpan.innerHTML;
+            targetContainer.classList.remove('empty');
+            targetContainer.classList.add('green-highlight');
+
+            if (targetId === 'champion') {
+                targetNameSpan.innerHTML = '🏆 ' + sourceNameSpan.innerHTML;
+            }
+        }
+
+        function clearSlot(id) {
+            let container = document.getElementById(id);
+            if (container.classList.contains('locked-state')) return;
+            
+            let nameSpan = container.querySelector('.clickable-name');
+            nameSpan.innerHTML = "TBD";
+            container.classList.add('empty');
+            container.classList.remove('green-highlight');
+            
+            let downstreamMap = {
+                'r16-1-2': 'qf-1-1', 'r16-2-1': 'qf-1-2', 'r16-2-2': 'qf-1-2',
+                'r16-3-1': 'qf-2-1', 'r16-3-2': 'qf-2-1', 'r16-4-1': 'qf-2-2', 'r16-4-2': 'qf-2-2',
+                'qf-1-1': 'sf-1-1', 'qf-1-2': 'sf-1-1', 'qf-2-1': 'sf-1-2', 'qf-2-2': 'sf-1-2',
+                'sf-1-1': 'f-1-1', 'sf-1-2': 'f-1-1', 'sf-2-1': 'f-1-2', 'sf-2-2': 'f-1-2',
+                'f-1-1': 'champion', 'f-1-2': 'champion'
+            };
+            if (downstreamMap[id]) clearSlot(downstreamMap[id]);
+        }
+
+        function toggleLock(id) {
+            let container = document.getElementById(id);
+            let btn = container.querySelector('.lock-btn');
+            if (container.classList.contains('empty') && container.querySelector('.clickable-name').innerText === 'TBD') return;
+
+            if (container.classList.contains('locked-state')) {
+                container.classList.remove('locked-state');
+                btn.innerText = '🔓';
+            } else {
+                container.classList.add('locked-state');
+                btn.innerText = '🔒';
+            }
+        }
+
+        // Trigger immediate connection request on startup
+        fetchLiveStandings();
+    </script>
+</body>
+</html>
